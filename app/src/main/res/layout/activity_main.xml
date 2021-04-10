@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+
+    <LinearLayout
+        android:id="@+id/mainlinearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:weightSum="100">
+
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="2"
+            />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="39.5">
+
+            <com.github.mikephil.charting.charts.PieChart
+                android:id="@+id/pieChart"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+            </com.github.mikephil.charting.charts.PieChart>
+
+            <TextView
+                android:id="@+id/textView_Percent"
+                android:fontFamily="@font/letterslaughing"
+                android:textSize="55dp"
+                android:includeFontPadding="false"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center|center_vertical"
+                android:text="@string/TextView_Percent"
+                android:textColor="@color/main"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="4"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/textView_RemainingTime"
+                android:fontFamily="@font/kosugimaru_regular"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="@string/textView_RemainingTime"
+                android:textColor="@color/main"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="4"
+            android:orientation="horizontal"
+            android:weightSum="1000">
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="25" />
+
+            <Button
+                android:id="@+id/button_Recode"
+                android:fontFamily="@font/kosugimaru_regular"
+                android:elevation="0dp"
+                android:textColor="@color/white"
+                android:background="@drawable/shape_rounded_corners"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="300"
+                android:text="@string/button_Recode" />
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="25" />
+
+            <Button
+                android:id="@+id/button_Day"
+                android:fontFamily="@font/kosugimaru_regular"
+                android:elevation="0dp"
+                android:textColor="@color/white"
+                android:background="@drawable/shape_rounded_corners"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="300"
+                android:text="@string/button_Day" />
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="25" />
+
+            <Button
+                android:id="@+id/button_AddRoutine"
+                android:fontFamily="@font/kosugimaru_regular"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="300"
+                android:background="@drawable/shape_rounded_corners"
+                android:elevation="0dp"
+                android:text="@string/button_Routine"
+                android:textColor="@color/white" />
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="25" />
+
+        </LinearLayout>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.5" />
+
+        <ListView
+            android:id="@+id/listView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="49"
+            android:background="@color/bg"
+            android:divider="#00000000"
+            android:dividerHeight="6dp"
+            android:headerDividersEnabled="true"
+            android:paddingTop="7dp"
+            tools:listitem="@layout/routin_cell">
+
+        </ListView>
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

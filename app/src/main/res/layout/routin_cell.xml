@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/Button_Cell_name"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/clear"
+    android:weightSum="100">
+
+    <Space
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardView"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="98"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="0dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:weightSum="100">
+
+            <TextView
+                android:id="@+id/textView_Check"
+                android:fontFamily="@font/kosugimaru_regular"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="10"
+                android:textColor="@color/main"
+                android:background="@color/clear"
+                android:gravity="center"
+                android:text="@string/textView_check" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="75"
+                android:background="@color/clear">
+
+                <TextView
+                    android:id="@+id/textView_Name"
+                    android:fontFamily="@font/kosugimaru_regular"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@color/clear"
+                    android:gravity="center_horizontal|center_vertical"
+                    android:text=""
+                    android:textColor="@color/black"
+                    android:textSize="24sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <LinearLayout
+                    android:id="@+id/lineLayout"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:background="@color/clear"
+                    android:weightSum="100"
+                    android:orientation="vertical"
+                    app:layout_constraintBottom_toBottomOf="@id/textView_Name"
+                    app:layout_constraintEnd_toEndOf="@id/textView_Name"
+                    app:layout_constraintStart_toStartOf="@id/textView_Name"
+                    app:layout_constraintTop_toTopOf="@id/textView_Name">
+
+                    <View
+                        android:id="@+id/view1"
+                        android:background="@color/clear"
+                        android:layout_weight="38"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp" />
+
+                    <View
+                        android:id="@+id/view2"
+                        android:background="@color/black"
+                        android:layout_weight="6.5"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp" />
+
+                    <View
+                        android:id="@+id/view3"
+                        android:background="@color/clear"
+                        android:layout_weight="13"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp" />
+                    <View
+                        android:id="@+id/view4"
+                        android:background="@color/black"
+                        android:layout_weight="6.5"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp" />
+                    <View
+                        android:id="@+id/view5"
+                        android:background="@color/clear"
+                        android:layout_weight="36"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp" />
+                </LinearLayout>
+
+                <Button
+                    android:id="@+id/button_Name"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@color/clear"
+                    android:fontFamily="@font/kosugimaru_regular"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+            <Button
+                android:id="@+id/button_Delete"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="15"
+                android:background="@color/clear"
+                android:fontFamily="sans-serif-black"
+                android:gravity="center_horizontal|center_vertical"
+                android:includeFontPadding="false"
+                android:text="@string/button_Delete"
+                android:textColor="@color/main"
+                android:textSize="55dp" />
+
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+    <Space
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1" />
+
+</LinearLayout>

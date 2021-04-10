@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">一週間ルーティン</string>
+    <string name="button_Recode">記録</string>
+    <string name="button_Day">期限(日曜日)</string>
+    <string name="button_Routine">追加</string>
+    <string name="button_Delete">×️</string>
+    <string name="TextView_Percent">0%</string>
+    <string name="textView_RemainingTime">残り何日</string>
+    <string name="textView_check">✔︎</string>
+    <string name="textView_return">戻る︎</string>
+    <string name="textView_Recode_Per">%︎ </string>
+    <string name="button_Page_Pluss">>>  </string>
+    <string name="button_Page_Minus">  &lt;&lt;</string>
+    <string name="textView_AchievementCount">達成回数何回</string>
+</resources>
