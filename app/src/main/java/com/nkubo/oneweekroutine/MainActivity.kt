@@ -3,7 +3,7 @@ package com.nkubo.oneweekroutine
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
+import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -12,6 +12,7 @@ import android.util.DisplayMetrics
 import android.view.Gravity
 import android.view.View
 import android.view.WindowManager
+import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.*
 import androidx.annotation.RequiresApi
@@ -27,14 +28,12 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
-
 class MainActivity() : AppCompatActivity(){
     var save=Save()
     var routineList = ArrayList<RoutineList>()
     var recodeList = ArrayList<RecodeList>()
     val handler = Handler()
     var timeValue = 0
-
     val EEEEFormat = SimpleDateFormat("EEEE", Locale.JAPAN)
     val yyyyFormat=SimpleDateFormat("yyyy")
     val MFormat=SimpleDateFormat("M")
@@ -44,24 +43,45 @@ class MainActivity() : AppCompatActivity(){
     var jsonSave :String=""
     var jsonRoutineList :String=""
     var jsonRecodeList :String=""
+    var bg:Int=0
+    var main:Int=0
+    var height:Float = 0F
+    var width:Float = 0F
+    var density:Float = 0F
+    val gson = Gson()
 
-
-    val dm = DisplayMetrics()
-
-    val bg= Color.parseColor("#ffbe91")
-    val main= Color.parseColor("#ff8c00")
-
+    lateinit var sharedPref: SharedPreferences
+    lateinit var animeAddCell:Animation
+    lateinit var listView:ListView
+    lateinit var button_AddRoutine:Button
+    lateinit var button_Day:Button
+    lateinit var button_Recode:Button
+    lateinit var textView_Percent:TextView
+    lateinit var textView_RemainingTime:TextView
+    lateinit var pieChart:PieChart
+    lateinit var dm:DisplayMetrics
 
     @RequiresApi(Build.VERSION_CODES.O)
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val sharedPref = getSharedPreferences("sharedPref", Context.MODE_PRIVATE)
-        val gson = Gson()
-        val animeAddCell = AnimationUtils.loadAnimation(this.applicationContext, R.anim.addcell)
-
+        sharedPref = getSharedPreferences("sharedPref", Context.MODE_PRIVATE)
+        animeAddCell = AnimationUtils.loadAnimation(this.applicationContext, R.anim.addcell)
+        bg= getColor(R.color.bg)
+        main= getColor(R.color.main)
+        listView = findViewById<ListView>(R.id.listView)
+        button_AddRoutine = findViewById<Button>(R.id.button_AddRoutine)
+        button_Day = findViewById<Button>(R.id.button_Day)
+        button_Recode = findViewById<Button>(R.id.button_Recode)
+        textView_Percent = findViewById<TextView>(R.id.textView_Percent)
+        textView_RemainingTime = findViewById<TextView>(R.id.textView_RemainingTime)
+        pieChart = findViewById<PieChart>(R.id.pieChart)
+        dm = DisplayMetrics()
+        getWindowManager().getDefaultDisplay().getMetrics(dm)
+        height = dm.heightPixels/dm.density
+        width = dm.widthPixels/dm.density
+        density=dm.density
 
         val readSave: String? = sharedPref.getString("save", "")
         val readRecodeList: String? = sharedPref.getString("recodeList", "")
@@ -69,30 +89,13 @@ class MainActivity() : AppCompatActivity(){
         val RecodeType = object : TypeToken<List<RecodeList>>() {}.type
         val RoutineType = object : TypeToken<List<RoutineList>>() {}.type
 
-        val listView = findViewById<ListView>(R.id.listView)
-        val button_AddRoutine = findViewById<Button>(R.id.button_AddRoutine)
-        val button_Day = findViewById<Button>(R.id.button_Day)
-        val button_Recode = findViewById<Button>(R.id.button_Recode)
-        val textView_Percent = findViewById<TextView>(R.id.textView_Percent)
-        val textView_RemainingTime = findViewById<TextView>(R.id.textView_RemainingTime)
-        val pieChart = findViewById<PieChart>(R.id.pieChart)
-
-
-        val dm = DisplayMetrics()
-
-        getWindowManager().getDefaultDisplay().getMetrics(dm)
-        val height = dm.heightPixels/dm.density
-        val width = dm.widthPixels/dm.density
-        val density=dm.density
-
         button_AddRoutine.textSize= (height/48)
         button_Day.textSize= (height/48)
         button_Recode.textSize= (height/48)
         textView_RemainingTime.textSize= (height/32.6).toFloat()
 
-
         if(height<590){
-            textView_Percent.textSize=(height/19).toFloat()
+            textView_Percent.textSize=(height/19)
         }else{
             textView_Percent.textSize=(height/13.3).toFloat()
         }
@@ -110,39 +113,31 @@ class MainActivity() : AppCompatActivity(){
         val arrayAdapter = RoutineAdapter(this, routineList,height,density)
         listView.setBackgroundColor(bg)
         listView.adapter = arrayAdapter
-
-        pieChart.data = pieChartProsecc()
-        pieChart.legend.isEnabled = false
-        pieChart.isHighlightPerTapEnabled=false
-        pieChart.isRotationEnabled=false
-        pieChart.holeRadius= 58F
-        pieChart.transparentCircleRadius=0F
-
-        pieChart.description=null
-        pieChart.animateXY(800,800)
+        pieChartProsecc()
         textView_Percent.text = save.nowPercent + "%"
+
 
         when (save.deadlineDayWeek) {
             "日曜日" -> {
-                button_Day.text = "期限(日曜日)"
+                button_Day.setText(R.string.button_Day_Sunday)
             }
             "月曜日" -> {
-                button_Day.text = "期限(月曜日)"
+                button_Day.setText(R.string.button_Day_Monday)
             }
             "火曜日" -> {
-                button_Day.text = "期限(火曜日)"
+                button_Day.setText(R.string.button_Day_Tuesday)
             }
             "水曜日" -> {
-                button_Day.text = "期限(水曜日)"
+                button_Day.setText(R.string.button_Day_Wednesday)
             }
             "木曜日" -> {
-                button_Day.text = "期限(木曜日)"
+                button_Day.setText(R.string.button_Day_Thursday)
             }
             "金曜日" -> {
-                button_Day.text = "期限(金曜日)"
+                button_Day.setText(R.string.button_Day_Friday)
             }
             "土曜日" -> {
-                button_Day.text = "期限(土曜日)"
+                button_Day.setText(R.string.button_Day_Saturday)
             }
         }
 
@@ -156,7 +151,7 @@ class MainActivity() : AppCompatActivity(){
             override fun run() {
                 timeValue++
                 handler.postDelayed(this, 1000)
-                textView_RemainingTime.text=timeProcess()
+                timeProcess()
                 val nowYear:String =yyyyFormat.format(Date())
                 val nowMonth:String =MFormat.format(Date())
                 val nowDay:String =dFormat.format(Date())
@@ -165,45 +160,24 @@ class MainActivity() : AppCompatActivity(){
                     addRecode()
                     updateDeadline()
                     arrayAdapter.notifyDataSetChanged()
-                    jsonSave=gson.toJson(save)
-                    sharedPref.edit().putString("save",jsonSave).apply()
-                    jsonRoutineList=gson.toJson(routineList)
-                    sharedPref.edit().putString("routineList",jsonRoutineList).apply()
-                    jsonRecodeList=gson.toJson(recodeList)
-                    sharedPref.edit().putString("recodeList",jsonRecodeList).apply()
-                    save.nowPercent= percentProcess(routineList)
-                    textView_Percent.text = save.nowPercent + "%"
-                    pieChart.data = pieChartProsecc()
-                    pieChart.animateXY(800,800)
+                    saveProsecc()
+                    percentProcess(routineList)
+                    pieChartProsecc()
 
                 }else if(save.deadlineYear.toInt()==nowYear.toInt() && save.deadlineMonth.toInt()<nowMonth.toInt()){
                     addRecode()
                     updateDeadline()
                     arrayAdapter.notifyDataSetChanged()
-                    jsonSave=gson.toJson(save)
-                    sharedPref.edit().putString("save",jsonSave).apply()
-                    jsonRoutineList=gson.toJson(routineList)
-                    sharedPref.edit().putString("routineList",jsonRoutineList).apply()
-                    jsonRecodeList=gson.toJson(recodeList)
-                    sharedPref.edit().putString("recodeList",jsonRecodeList).apply()
-                    save.nowPercent= percentProcess(routineList)
-                    textView_Percent.text = save.nowPercent + "%"
-                    pieChart.data = pieChartProsecc()
-                    pieChart.animateXY(800,800)
+                    saveProsecc()
+                    percentProcess(routineList)
+                    pieChartProsecc()
                 }else if(save.deadlineYear.toInt()==nowYear.toInt() && save.deadlineMonth.toInt()==nowMonth.toInt() && save.deadlineDay.toInt()<nowDay.toInt()){
                     addRecode()
                     updateDeadline()
                     arrayAdapter.notifyDataSetChanged()
-                    jsonSave=gson.toJson(save)
-                    sharedPref.edit().putString("save",jsonSave).apply()
-                    jsonRoutineList=gson.toJson(routineList)
-                    sharedPref.edit().putString("routineList",jsonRoutineList).apply()
-                    jsonRecodeList=gson.toJson(recodeList)
-                    sharedPref.edit().putString("recodeList",jsonRecodeList).apply()
-                    save.nowPercent= percentProcess(routineList)
-                    textView_Percent.text = save.nowPercent + "%"
-                    pieChart.data = pieChartProsecc()
-                    pieChart.animateXY(800,800)
+                    saveProsecc()
+                    percentProcess(routineList)
+                    pieChartProsecc()
                 }
 
             }
@@ -220,14 +194,11 @@ class MainActivity() : AppCompatActivity(){
                             routineList.removeAt(i)
                         }
                     }
-                    save.nowPercent= percentProcess(routineList)
+                    percentProcess(routineList)
                     Handler().postDelayed({
                         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
                     }, 500)
-                    jsonRoutineList=gson.toJson(routineList)
-                    sharedPref.edit().putString("routineList",jsonRoutineList).apply()
-                    jsonSave=gson.toJson(save)
-                    sharedPref.edit().putString("save",jsonSave).apply()
+                    saveProsecc()
                 }else {
                     if(routineList[position].check==true){
                         routineList[position].check=false
@@ -242,15 +213,10 @@ class MainActivity() : AppCompatActivity(){
                             }
                         }
                     }
-                    save.nowPercent= percentProcess(routineList)
-                    textView_Percent.text = save.nowPercent + "%"
-                    pieChart.data = pieChartProsecc()
-                    pieChart.animateXY(800,800)
+                    percentProcess(routineList)
+                    pieChartProsecc()
                 }
-                jsonRoutineList=gson.toJson(routineList)
-                sharedPref.edit().putString("routineList",jsonRoutineList).apply()
-                jsonSave=gson.toJson(save)
-                sharedPref.edit().putString("save",jsonSave).apply()
+                saveProsecc()
             }
 
             override fun celldelete(view: View, position: Int) {
@@ -260,7 +226,7 @@ class MainActivity() : AppCompatActivity(){
                             routineList.removeAt(i)
                         }
                     }
-                    save.nowPercent= percentProcess(routineList)
+                    percentProcess(routineList)
                 }else {
                     routineList.removeAt(position)
                     if (routineList.size != 0) {
@@ -273,19 +239,11 @@ class MainActivity() : AppCompatActivity(){
                 }
                 Handler().postDelayed({
                     getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
-                    save.nowPercent= percentProcess(routineList)
-                    textView_Percent.text = save.nowPercent + "%"
-                    pieChart.data = pieChartProsecc()
-                    pieChart.animateXY(800,800)
-                    jsonRoutineList=gson.toJson(routineList)
-                    sharedPref.edit().putString("routineList",jsonRoutineList).apply()
-                    jsonSave=gson.toJson(save)
-                    sharedPref.edit().putString("save",jsonSave).apply()
+                    percentProcess(routineList)
+                    pieChartProsecc()
+                    saveProsecc()
                 }, 500)
-                jsonRoutineList=gson.toJson(routineList)
-                sharedPref.edit().putString("routineList",jsonRoutineList).apply()
-                jsonSave=gson.toJson(save)
-                sharedPref.edit().putString("save",jsonSave).apply()
+                saveProsecc()
             }
 
             override fun stopWindow(view: View, position: Int) {
@@ -306,7 +264,6 @@ class MainActivity() : AppCompatActivity(){
             val dummy = RoutineList()
             routineList.add(dummy)
             arrayAdapter.notifyDataSetChanged()
-
 
             val title=TextView(this)
 
@@ -338,14 +295,9 @@ class MainActivity() : AppCompatActivity(){
                                     }
                                 }
                             }
-                            save.nowPercent= percentProcess(routineList)
-                            textView_Percent.text = save.nowPercent + "%"
-                            jsonRoutineList=gson.toJson(routineList)
-                            sharedPref.edit().putString("routineList",jsonRoutineList).apply()
-                            jsonSave=gson.toJson(save)
-                            sharedPref.edit().putString("save",jsonSave).apply()
-                            pieChart.data = pieChartProsecc()
-                            pieChart.animateXY(800,800)
+                            percentProcess(routineList)
+                            saveProsecc()
+                            pieChartProsecc()
                         }
                     })
                     .setNegativeButton("キャンセル", { dialog, which ->
@@ -371,36 +323,35 @@ class MainActivity() : AppCompatActivity(){
                         when (which) {
                             0 -> {
                                 save.deadlineDayWeek = "日曜日"
-                                button_Day.text = "期限(日曜日)"
+                                button_Day.setText(R.string.button_Day_Sunday)
                             }
                             1 -> {
                                 save.deadlineDayWeek = "月曜日"
-                                button_Day.text = "期限(月曜日)"
+                                button_Day.setText(R.string.button_Day_Monday)
                             }
                             2 -> {
                                 save.deadlineDayWeek = "火曜日"
-                                button_Day.text = "期限(火曜日)"
+                                button_Day.setText(R.string.button_Day_Tuesday)
                             }
                             3 -> {
                                 save.deadlineDayWeek = "水曜日"
-                                button_Day.text = "期限(水曜日)"
+                                button_Day.setText(R.string.button_Day_Wednesday)
                             }
                             4 -> {
                                 save.deadlineDayWeek = "木曜日"
-                                button_Day.text = "期限(木曜日)"
+                                button_Day.setText(R.string.button_Day_Thursday)
                             }
                             5 -> {
                                 save.deadlineDayWeek = "金曜日"
-                                button_Day.text = "期限(金曜日)"
+                                button_Day.setText(R.string.button_Day_Friday)
                             }
                             6 -> {
                                 save.deadlineDayWeek = "土曜日"
-                                button_Day.text = "期限(土曜日)"
+                                button_Day.setText(R.string.button_Day_Saturday)
                             }
                         }
                         updateDeadline()
-                        jsonSave=gson.toJson(save)
-                        sharedPref.edit().putString("save",jsonSave).apply()
+                        saveProsecc()
                     }
                     .show()
         }
@@ -416,7 +367,7 @@ class MainActivity() : AppCompatActivity(){
     }
 
 
-    fun percentProcess(routineList: ArrayList<RoutineList>):String{
+    fun percentProcess(routineList: ArrayList<RoutineList>){
         var per: String = "0"
         if (routineList.size != 0) {
             per = (100 * routineList.filter { it.check == true }.size / routineList.size).toString()
@@ -426,10 +377,11 @@ class MainActivity() : AppCompatActivity(){
                 }
             }
         }
-        return per
+        save.nowPercent=per
+        textView_Percent.text=save.nowPercent+"%"
     }
 
-    fun timeProcess():String {
+    fun timeProcess(){
         var res:String=""
         for(i in 0..6){
             val calendar = Calendar.getInstance()
@@ -440,13 +392,19 @@ class MainActivity() : AppCompatActivity(){
                 if(i+1==1){
                     val nowHH:String=HHFormat.format(calendar.time)
                     val nowmm:String=mmFormat.format(calendar.time)
-                    res="あと、"+(23-nowHH.toInt()).toString()+"時間"+(60-nowmm.toInt()).toString()+"分"
+                    var hh:Int=23-nowHH.toInt()
+                    var mm:Int=60-nowmm.toInt()
+                    if(mm==60){
+                        mm=0
+                        hh=hh+1
+                    }
+                    res="あと、"+hh.toString()+"時間"+mm.toString()+"分"
                 }else {
                     res = "あと、" + (i + 1).toString() + "日"
                 }
             }
         }
-        return res
+        textView_RemainingTime.text=res
     }
 
     fun updateDeadline(){
@@ -475,7 +433,7 @@ class MainActivity() : AppCompatActivity(){
         }
     }
 
-    fun pieChartProsecc():PieData{
+    fun pieChartProsecc(){
         var noNowPercent: Float = (100 - save.nowPercent.toInt()).toFloat()
         var entryList = mutableListOf<PieEntry>()
         entryList.add(PieEntry(save.nowPercent.toFloat(),""))
@@ -483,9 +441,25 @@ class MainActivity() : AppCompatActivity(){
         val pieDataSet = PieDataSet(entryList, "")
         pieDataSet.setDrawValues(false)
         pieDataSet.setColors(main,bg)
-        val pieData = PieData(pieDataSet)
-        return pieData
+        pieChart.data = PieData(pieDataSet)
+        pieChart.legend.isEnabled = false
+        pieChart.isHighlightPerTapEnabled=false
+        pieChart.isRotationEnabled=false
+        pieChart.holeRadius= 58F
+        pieChart.transparentCircleRadius=0F
+        pieChart.description=null
+        pieChart.invalidate()
+        pieChart.animateXY(800,800)
     }
+    fun saveProsecc(){
+        jsonSave=gson.toJson(save)
+        sharedPref.edit().putString("save",jsonSave).apply()
+        jsonRoutineList=gson.toJson(routineList)
+        sharedPref.edit().putString("routineList",jsonRoutineList).apply()
+        jsonRecodeList=gson.toJson(recodeList)
+        sharedPref.edit().putString("recodeList",jsonRecodeList).apply()
+    }
+
 }
 
 

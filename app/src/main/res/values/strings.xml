@@ -1,7 +1,13 @@
 <resources>
     <string name="app_name">一週間ルーティン</string>
     <string name="button_Recode">記録</string>
-    <string name="button_Day">期限(日曜日)</string>
+    <string name="button_Day_Sunday">期限(日曜日)</string>
+    <string name="button_Day_Monday">期限(月曜日)</string>
+    <string name="button_Day_Tuesday">期限(火曜日)</string>
+    <string name="button_Day_Wednesday">期限(水曜日)</string>
+    <string name="button_Day_Thursday">期限(木曜日)</string>
+    <string name="button_Day_Friday">期限(金曜日)</string>
+    <string name="button_Day_Saturday">期限(土曜日)</string>
     <string name="button_Routine">追加</string>
     <string name="button_Delete">×️</string>
     <string name="TextView_Percent">0%</string>

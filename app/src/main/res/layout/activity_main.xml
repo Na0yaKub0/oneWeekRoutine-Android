@@ -115,7 +115,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="300"
-                android:text="@string/button_Day" />
+                android:text="@string/button_Day_Sunday" />
 
             <Space
                 android:layout_width="0dp"

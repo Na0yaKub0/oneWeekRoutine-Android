@@ -21,13 +21,8 @@ class RoutineAdapter(context: Context, private val list: ArrayList<RoutineList>,
     val bg= getColor(context,R.color.bg)
     val white= getColor(context,R.color.white)
     val clear= getColor(context,R.color.clear)
-
-
-
-    // リスナー格納変数
-    lateinit var listener: OnItemClickListener
     val animeDeleteCell = AnimationUtils.loadAnimation(context, R.anim.deletecell)
-
+    lateinit var listener: OnItemClickListener
 
 
     override fun getCount(): Int {
@@ -106,14 +101,12 @@ class RoutineAdapter(context: Context, private val list: ArrayList<RoutineList>,
         return view
     }
 
-    //インターフェースの作成
     interface OnItemClickListener{
         fun cellupdate(view: View, position: Int)
         fun celldelete(view: View, position: Int)
         fun stopWindow(view: View, position: Int)
     }
 
-    // リスナー
     fun setOnItemClickListener(listener: OnItemClickListener){
         this.listener = listener
     }
