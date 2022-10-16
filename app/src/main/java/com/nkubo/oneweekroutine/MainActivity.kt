@@ -30,6 +30,7 @@ class MainActivity() : AppCompatActivity() {
     var save = Save()
     var routineList = ArrayList<RoutineList>()
     var recodeList = ArrayList<RecodeList>()
+    var routineAdapter: RoutineAdapter? = null
     val handler = Handler()
     var timeValue = 0
     val EEEEFormat = SimpleDateFormat("EEEE", Locale.JAPAN)
@@ -69,15 +70,11 @@ class MainActivity() : AppCompatActivity() {
         this.setTextSize()
         this.loadData()
         this.setColors()
-
-        animeAddCell = AnimationUtils.loadAnimation(this.applicationContext, R.anim.addcell)
-
-        val arrayAdapter = RoutineAdapter(this, routineList, height, density)
-        listView.setBackgroundColor(bgColor)
-        listView.adapter = arrayAdapter
-
+        this.setList()
         this.percentProcess(routineList)
         this.pieChartProsecc()
+
+        animeAddCell = AnimationUtils.loadAnimation(this.applicationContext, R.anim.addcell)
 
         when (save.deadlineDayWeek) {
             "日曜日" -> {
@@ -116,21 +113,27 @@ class MainActivity() : AppCompatActivity() {
              if (save.deadlineYear.toInt() <nowYear.toInt()) {
                     addRecode()
                     updateDeadline()
-                    arrayAdapter.notifyDataSetChanged()
+                    routineAdapter?.let {
+                        it.notifyDataSetChanged()
+                    }
                     saveProsecc()
                     percentProcess(routineList)
                     pieChartProsecc()
                 } else if (save.deadlineYear.toInt() == nowYear.toInt() && save.deadlineMonth.toInt() <nowMonth.toInt()) {
                     addRecode()
                     updateDeadline()
-                    arrayAdapter.notifyDataSetChanged()
+                    routineAdapter?.let {
+                        it.notifyDataSetChanged()
+                    }
                     saveProsecc()
                     percentProcess(routineList)
                     pieChartProsecc()
                 } else if (save.deadlineYear.toInt() == nowYear.toInt() && save.deadlineMonth.toInt() == nowMonth.toInt() && save.deadlineDay.toInt() <nowDay.toInt()) {
                     addRecode()
                     updateDeadline()
-                    arrayAdapter.notifyDataSetChanged()
+                    routineAdapter?.let {
+                        it.notifyDataSetChanged()
+                    }
                     saveProsecc()
                     percentProcess(routineList)
                     pieChartProsecc()
@@ -139,86 +142,94 @@ class MainActivity() : AppCompatActivity() {
         }
         handler.post(runnable)
 
-        arrayAdapter.setOnItemClickListener(object : RoutineAdapter.OnItemClickListener {
-            override fun cellupdate(view: View, position: Int) {
-                if (routineList[position].name == "") {
-                    getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+        // リストアクション
+        routineAdapter?.let {
+            it.setOnItemClickListener(object : RoutineAdapter.OnItemClickListener {
+                override fun cellupdate(view: View, position: Int) {
+                    if (routineList[position].name == "") {
+                        getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
                             WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
-                    for (i in 0..routineList.size - 1) {
-                        if (routineList[i].name == "") {
-                            routineList.removeAt(i)
+                        for (i in 0..routineList.size - 1) {
+                            if (routineList[i].name == "") {
+                                routineList.removeAt(i)
+                            }
+                        }
+                        percentProcess(routineList)
+                        Handler().postDelayed({
+                            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+                        }, 500)
+                        saveProsecc()
+                    } else {
+                        if (routineList[position].check == true) {
+                            routineList[position].check = false
+                        } else {
+                            routineList[position].check = true
+                        }
+                        it.notifyDataSetChanged()
+                        if (routineList.size != 0) {
+                            for (i in 0..routineList.size - 1) {
+                                if (routineList[i].name == "") {
+                                    routineList.removeAt(i)
+                                }
+                            }
+                        }
+                        percentProcess(routineList)
+                        pieChartProsecc()
+                    }
+                    saveProsecc()
+                }
+
+                override fun celldelete(view: View, position: Int) {
+                    if (routineList[position].name == "") {
+                        for (i in 0..routineList.size - 1) {
+                            if (routineList[i].name == "") {
+                                routineList.removeAt(i)
+                            }
+                        }
+                        percentProcess(routineList)
+                    } else {
+                        routineList.removeAt(position)
+                        if (routineList.size != 0) {
+                            for (i in 0..routineList.size - 1) {
+                                if (routineList[i].name == "") {
+                                    routineList.removeAt(i)
+                                }
+                            }
                         }
                     }
-                    percentProcess(routineList)
                     Handler().postDelayed({
                         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+                        percentProcess(routineList)
+                        pieChartProsecc()
+                        saveProsecc()
                     }, 500)
                     saveProsecc()
-                } else {
-                    if (routineList[position].check == true) {
-                        routineList[position].check = false
-                    } else {
-                        routineList[position].check = true
-                    }
-                    arrayAdapter.notifyDataSetChanged()
-                    if (routineList.size != 0) {
-                        for (i in 0..routineList.size - 1) {
-                            if (routineList[i].name == "") {
-                                routineList.removeAt(i)
-                            }
-                        }
-                    }
-                    percentProcess(routineList)
-                    pieChartProsecc()
                 }
-                saveProsecc()
-            }
 
-            override fun celldelete(view: View, position: Int) {
-                if (routineList[position].name == "") {
-                    for (i in 0..routineList.size - 1) {
-                        if (routineList[i].name == "") {
-                            routineList.removeAt(i)
-                        }
-                    }
-                    percentProcess(routineList)
-                } else {
-                    routineList.removeAt(position)
-                    if (routineList.size != 0) {
-                        for (i in 0..routineList.size - 1) {
-                            if (routineList[i].name == "") {
-                                routineList.removeAt(i)
-                            }
-                        }
-                    }
-                }
-                Handler().postDelayed({
-                    getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
-                    percentProcess(routineList)
-                    pieChartProsecc()
-                    saveProsecc()
-                }, 500)
-                saveProsecc()
-            }
-
-            override fun stopWindow(view: View, position: Int) {
-                getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                override fun stopWindow(view: View, position: Int) {
+                    getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
                         WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
-            }
-        })
+                }
+            })
+        }
 
+        // ルーティン追加
         button_AddRoutine.setOnClickListener {
             if (routineList.size != 0) {
                 for (i in 0..routineList.size - 1) {
                     if (routineList[i].name == "") {
                         routineList.removeAt(i)
-                        arrayAdapter.notifyDataSetChanged()
+                        routineAdapter?.let {
+                            it.notifyDataSetChanged()
+                        }
                     }
                 }
             }
             val dummy = RoutineList()
             routineList.add(dummy)
-            arrayAdapter.notifyDataSetChanged()
+            routineAdapter?.let {
+                it.notifyDataSetChanged()
+            }
 
             val title = TextView(this)
 
@@ -242,7 +253,9 @@ class MainActivity() : AppCompatActivity() {
                             if (listView.getChildAt(routineList.size - 1) != null) {
                                 listView.getChildAt(routineList.size - 1).startAnimation(animeAddCell)
                             }
-                            arrayAdapter.notifyDataSetChanged()
+                            routineAdapter?.let {
+                                it.notifyDataSetChanged()
+                            }
                             if (routineList.size != 0) {
                                 for (i in 0..routineList.size - 1) {
                                     if (routineList[i].name == "") {
@@ -257,11 +270,14 @@ class MainActivity() : AppCompatActivity() {
                     })
                     .setNegativeButton("キャンセル", { dialog, which ->
                         routineList.removeAt(routineList.size - 1)
-                        arrayAdapter.notifyDataSetChanged()
+                        routineAdapter?.let {
+                            it.notifyDataSetChanged()
+                        }
                     })
                     .show()
         }
 
+        // 期限指定
         button_Day.setOnClickListener {
             val strList = arrayOf("日曜日", "月曜日", "火曜日", "水曜日", "木曜日", "金曜日", "土曜日")
             val title = TextView(this)
@@ -311,6 +327,7 @@ class MainActivity() : AppCompatActivity() {
                     .show()
         }
 
+        // 記録移動
         button_Recode.setOnClickListener {
             jsonRecodeList = gson.toJson(recodeList)
             val intent = Intent(this@MainActivity, RecodeActivity::class.java)
@@ -377,6 +394,9 @@ class MainActivity() : AppCompatActivity() {
     }
 
     private fun setList() {
+        routineAdapter = RoutineAdapter(this, routineList, height, density)
+        listView.setBackgroundColor(bgColor)
+        listView.adapter = routineAdapter
     }
 
     fun percentProcess(routineList: ArrayList<RoutineList>) {
